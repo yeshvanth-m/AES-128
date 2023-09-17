@@ -256,5 +256,20 @@ int main()
     aes128_shift_rows (encrypt);
     aes128_add_round_key (round, encrypt);
 
+    round = 0u;
+    aes128_add_round_key (round, decrypt);
+
+    for (round = 1; round < 10; round++)
+    {
+        aes128_shift_rows (decrypt);
+        aes128_substitute_bytes (decrypt);
+        aes128_add_round_key (round, decrypt);
+        aes128_mix_columns (decrypt);
+    }
+
+    aes128_shift_rows (decrypt);
+    aes128_substitute_bytes (decrypt);
+    aes128_add_round_key (round, decrypt);
+
     printf("Hello World");
 }
