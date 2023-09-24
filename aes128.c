@@ -46,12 +46,9 @@ void aes128_add_round_key (uint8_t round, bool aes128_is_encrypt)
         }
     }
     
-    for (uint8_t row = 0u; row < 4u; row++)
+    for (uint8_t idx = 0; idx < 16u; idx++)
     {
-        for (uint8_t col = 0u; col < 4u; col++)
-        {
-            aes128_state[(row * STATE_ROWS) + col] ^= round_key[(row * KEY_ROWS) + col];
-        }
+        aes128_state[idx] ^= round_key[idx];
     }
     
 }
@@ -67,13 +64,9 @@ void aes128_substitute_bytes (bool aes128_is_encrypt)
     {
         sBoxMat = aes128_sBox_Inv;
     }
-    for (uint8_t row = 0u; row < 4u; row++)
+    for (uint8_t idx = 0u; idx < 4u; idx++)
     {
-        for (uint8_t col = 0u; col < 4u; col++)
-        {
-            aes128_state[(row * STATE_ROWS) + col] = 
-                sBoxMat[((((aes128_state[(row * STATE_ROWS) + col]) & (0xF0u)) >> 4u) * SBOX_ROWS) + ((aes128_state[(row * STATE_ROWS) + col]) & (0x0Fu))];
-        }
+        aes128_state[idx] = sBoxMat[aes128_state[idx]];
     }
 }
 
@@ -120,7 +113,7 @@ void aes128_shift_rows (bool aes128_is_encrypt)
 
 uint8_t aes128_mul_bytes (uint8_t *lut, uint8_t byte)
 {
-    return lut[(((byte & (0xF0u)) >> 4u) * LUT_ROWS) + (byte & (0x0Fu))];
+    return lut[byte];
 }
 
 void aes128_mix_columns (bool aes128_is_encrypt)
