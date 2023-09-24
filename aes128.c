@@ -64,7 +64,7 @@ void aes128_substitute_bytes (bool aes128_is_encrypt)
     {
         sBoxMat = aes128_sBox_Inv;
     }
-    for (uint8_t idx = 0u; idx < 4u; idx++)
+    for (uint8_t idx = 0u; idx < 16u; idx++)
     {
         aes128_state[idx] = sBoxMat[aes128_state[idx]];
     }
@@ -72,48 +72,21 @@ void aes128_substitute_bytes (bool aes128_is_encrypt)
 
 void aes128_shift_rows (bool aes128_is_encrypt)
 {
+    uint32_t *rows = (uint32_t *)aes128_state;
     if (aes128_is_encrypt)
     {
-        for (uint8_t row = 1u; row < 4u; row++)
-        {
-            uint8_t shift = row;
-            while (shift > 0u)
-            {
-                uint8_t col = 0u, temp = aes128_state[(row * STATE_ROWS) + col];
-                while (col < 3u)
-                {
-                    aes128_state[(row * STATE_ROWS) + col] = aes128_state[(row * STATE_ROWS) + col + 1u];
-                    col++;
-                }
-                aes128_state[(row * STATE_ROWS) + col] = temp;
-                shift--;
-            }
-        }
+        
+        *(rows + 1u) = ((*(rows + 1u) & 0xFF000000u) >> 24u) | ((*(rows + 1u) & 0x00FFFFFFu) << 8u);
+        *(rows + 2u) = ((*(rows + 2u) & 0xFFFF0000u) >> 16u) | ((*(rows + 2u) & 0x0000FFFFu) << 16u);
+        *(rows + 3u) = ((*(rows + 3u) & 0xFFFFFF00u) >> 8u) | ((*(rows + 3u) & 0x000000FFu) << 24u);
     }
     else
     {
-        for (uint8_t row = 1u; row < 4u; row++)
-        {
-            uint8_t shift = row;
-            while (shift > 0u)
-            {
-                uint8_t col = 3u, temp = aes128_state[(row * STATE_ROWS) + col];
-                while (col > 0u)
-                {
-                    aes128_state[(row * STATE_ROWS) + col] = aes128_state[(row * STATE_ROWS) + col - 1u];
-                    col--;
-                }
-                aes128_state[(row * STATE_ROWS) + col] = temp;
-                shift--;
-            }
-        }
+        *(rows + 1u) = ((*(rows + 1u) & 0x000000FFu) << 24u) | ((*(rows + 1u) & 0xFFFFFF00u) >> 8u);
+        *(rows + 2u) = ((*(rows + 2u) & 0x0000FFFFu) << 16u) | ((*(rows + 2u) & 0xFFFF0000u) >> 16u);
+        *(rows + 3u) = ((*(rows + 3u) & 0x00FFFFFFu) << 8u) | ((*(rows + 3u) & 0xFF000000u) >> 24u);
     }
     
-}
-
-uint8_t aes128_mul_bytes (uint8_t *lut, uint8_t byte)
-{
-    return lut[byte];
 }
 
 void aes128_mix_columns (bool aes128_is_encrypt)
@@ -146,32 +119,32 @@ void aes128_mix_columns (bool aes128_is_encrypt)
                     }
                     case 0x2:
                     {
-                        col_sum ^= aes128_mul_bytes (aes128_mul_by_2, aes128_state[(matrix_col * STATE_ROWS) + state_col]);
+                        col_sum ^= aes128_mul_by_2[aes128_state[(matrix_col * STATE_ROWS) + state_col]];
                         break;
                     }
                     case 0x3:
                     {
-                        col_sum ^= aes128_mul_bytes (aes128_mul_by_3, aes128_state[(matrix_col * STATE_ROWS) + state_col]);
+                        col_sum ^= aes128_mul_by_3[aes128_state[(matrix_col * STATE_ROWS) + state_col]];
                         break;
                     }
                     case 0x9:
                     {
-                        col_sum ^=  aes128_mul_bytes (aes128_mul_by_9, aes128_state[(matrix_col * STATE_ROWS) + state_col]);
+                        col_sum ^= aes128_mul_by_9[aes128_state[(matrix_col * STATE_ROWS) + state_col]];
                         break;
                     }
                     case 0xb:
                     {
-                        col_sum ^= aes128_mul_bytes (aes128_mul_by_b, aes128_state[(matrix_col * STATE_ROWS) + state_col]);
+                        col_sum ^= aes128_mul_by_b[aes128_state[(matrix_col * STATE_ROWS) + state_col]];
                         break;
                     }
                     case 0xd:
                     {
-                        col_sum ^= aes128_mul_bytes (aes128_mul_by_d, aes128_state[(matrix_col * STATE_ROWS) + state_col]);
+                        col_sum ^= aes128_mul_by_d[aes128_state[(matrix_col * STATE_ROWS) + state_col]];
                         break;
                     }
                     case 0xe:
                     {
-                        col_sum ^= aes128_mul_bytes (aes128_mul_by_e, aes128_state[(matrix_col * STATE_ROWS) + state_col]);
+                        col_sum ^= aes128_mul_by_e[aes128_state[(matrix_col * STATE_ROWS) + state_col]];
                         break;
                     }
                     default:
@@ -205,7 +178,7 @@ void aes128_key_schedule (void)
 
         for (row = 0u; row < 4u; row++)
         {
-            round_key_col[row] = aes128_sBox[((((round_key_col[row]) & (0xF0u)) >> 4u) * SBOX_ROWS) + ((round_key_col[row]) & (0x0Fu))];
+            round_key_col[row] = aes128_sBox[round_key_col[row]];
         }
 
         for (col = 0u; col < 4u; col++)
