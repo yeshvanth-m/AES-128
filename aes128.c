@@ -72,21 +72,42 @@ void aes128_substitute_bytes (bool aes128_is_encrypt)
 
 void aes128_shift_rows (bool aes128_is_encrypt)
 {
-    uint32_t *rows = (uint32_t *)aes128_state;
     if (aes128_is_encrypt)
     {
-        
-        *(rows + 1u) = ((*(rows + 1u) & 0xFF000000u) >> 24u) | ((*(rows + 1u) & 0x00FFFFFFu) << 8u);
-        *(rows + 2u) = ((*(rows + 2u) & 0xFFFF0000u) >> 16u) | ((*(rows + 2u) & 0x0000FFFFu) << 16u);
-        *(rows + 3u) = ((*(rows + 3u) & 0xFFFFFF00u) >> 8u) | ((*(rows + 3u) & 0x000000FFu) << 24u);
+        for (uint8_t row = 1u; row < 4u; row++)
+        {
+            uint8_t shift = row;
+            while (shift > 0u)
+            {
+                uint8_t col = 0u, temp = aes128_state[(row * STATE_ROWS) + col];
+                while (col < 3u)
+                {
+                    aes128_state[(row * STATE_ROWS) + col] = aes128_state[(row * STATE_ROWS) + col + 1u];
+                    col++;
+                }
+                aes128_state[(row * STATE_ROWS) + col] = temp;
+                shift--;
+            }
+        }
     }
     else
     {
-        *(rows + 1u) = ((*(rows + 1u) & 0x000000FFu) << 24u) | ((*(rows + 1u) & 0xFFFFFF00u) >> 8u);
-        *(rows + 2u) = ((*(rows + 2u) & 0x0000FFFFu) << 16u) | ((*(rows + 2u) & 0xFFFF0000u) >> 16u);
-        *(rows + 3u) = ((*(rows + 3u) & 0x00FFFFFFu) << 8u) | ((*(rows + 3u) & 0xFF000000u) >> 24u);
+        for (uint8_t row = 1u; row < 4u; row++)
+        {
+            uint8_t shift = row;
+            while (shift > 0u)
+            {
+                uint8_t col = 3u, temp = aes128_state[(row * STATE_ROWS) + col];
+                while (col > 0u)
+                {
+                    aes128_state[(row * STATE_ROWS) + col] = aes128_state[(row * STATE_ROWS) + col - 1u];
+                    col--;
+                }
+                aes128_state[(row * STATE_ROWS) + col] = temp;
+                shift--;
+            }
+        }
     }
-    
 }
 
 void aes128_mix_columns (bool aes128_is_encrypt)
