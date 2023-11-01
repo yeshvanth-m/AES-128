@@ -23,22 +23,10 @@
 #include "aes128.h"
 
 /* The AES128 state matrix - will undergo operations */
-uint8_t aes128_state[16u] = 
-{
-    0x4C, 0x6D, 0x73, 0x64,
-    0x6F, 0x20, 0x75, 0x6F,
-    0x72, 0x69, 0x6D, 0x6C,
-    0x65, 0x70, 0x20, 0x6F
-};
+uint8_t aes128_state[16u];
 
 /* The input cipher key for encryption/decryption */
-uint8_t aes128_cipherKey[16u] = 
-{
-    0x2B, 0x28, 0xAB, 0x09,
-    0x7E, 0xAE, 0xF7, 0xCF,
-    0x15, 0xD2, 0x15, 0x4F,
-    0x16, 0xA6, 0x88, 0x3C
-};
+uint8_t aes128_cipherKey[16u];
 
 /* Function to add round key to the state */
 void aes128_add_round_key (uint8_t round, bool aes128_is_encrypt)
@@ -227,8 +215,11 @@ void aes128_mix_columns (bool aes128_is_encrypt)
 }
 
 /* Function to generate keys using the key schedule */
-void aes128_key_schedule (void)
+void aes128_key_schedule (uint8_t *cipherKey)
 {
+    /* Copy the cipher key */
+    memcpy((void *) aes128_cipherKey, (void *) cipherKey, sizeof(aes128_cipherKey));
+    /* Use the initial cipher key for rounds */
     memcpy ((void *)aes128_round_keys[0u], (void *)aes128_cipherKey, sizeof(aes128_cipherKey));
     for (uint8_t round = 0; round < 10; round++)
     {
@@ -275,25 +266,12 @@ void aes128_key_schedule (void)
     }
 }
 
-int main()
+void aes128_encrypt (uint8_t *plainText, uint8_t *cipherText)
 {
+    bool encrypt = true;
     uint8_t round = 0u;
-    bool encrypt = true, decrypt = !encrypt;
 
-    printf ("Initial state (Plain Text): ");
-    for (int i = 0; i < 16; i++)
-    {
-        printf ("%X, ", aes128_state[i]);
-    }
-
-    printf ("\nCipher Key (to key schedule): ");
-    for (int i = 0; i < 16; i++)
-    {
-        printf ("%X, ", aes128_cipherKey[i]);
-    }
-
-    /* Generate the keys through key schedule */
-    aes128_key_schedule ();
+    memcpy ((void *)aes128_state, (void *)plainText, sizeof(aes128_state));
 
     /* Start encryption by adding round key to input plain text */
     aes128_add_round_key (round, encrypt);
@@ -311,13 +289,16 @@ int main()
     aes128_shift_rows (encrypt);
     aes128_add_round_key (round, encrypt);
 
-    printf ("\nCipher Text (after encryption): ");
-    for (int i = 0; i < 16; i++)
-    {
-        printf ("%X, ", aes128_state[i]);
-    }
+    memcpy ((void *)cipherText, (void *)aes128_state, sizeof(aes128_state));
+}
 
-    round = 0u;
+void aes128_decrypt (uint8_t *cipherText, uint8_t *plainText)
+{
+    bool decrypt = false;
+    uint8_t round = 0u;
+
+    memcpy ((void *)aes128_state, (void *)cipherText, sizeof(aes128_state));
+
     /* Add the 10th round key for decryption */
     aes128_add_round_key (round, decrypt);
 
@@ -335,9 +316,5 @@ int main()
     aes128_substitute_bytes (decrypt);
     aes128_add_round_key (round, decrypt);
 
-    printf ("\nPlain Text (after decryption): ");
-    for (int i = 0; i < 16; i++)
-    {
-        printf ("%X, ", aes128_state[i]);
-    }
+    memcpy ((void *)plainText, (void *)aes128_state, sizeof(aes128_state));
 }
