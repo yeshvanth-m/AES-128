@@ -38,16 +38,58 @@ uint8_t aes128_cbc_iv[16u] =
     0x64, 0x95, 0xCB, 0xDF
 };
 
-char plainText[256u] = "Hi There, this is a sample text to encrypt.\0";
+char plainText[256u] = "Hi there, this is a text to be encrypted.\0";
 char cipherText[256u];
 
 uint8_t aes128_cbc_plainText[16u];
 uint8_t aes128_cbc_cipherText[16u];
 uint8_t num_blocks, num_padding;
 
+void print_plainText()
+{
+    for (int i = 0; i < 4; i++)
+    {
+        printf("\n");
+        for (int j = 0; j < 4; j++)
+        {
+            printf("%x, ", aes128_cbc_plainText[(i * 4u) + j]);
+        }
+    }
+    printf("\n");
+}
+
+void print_cipherText()
+{
+    for (int i = 0; i < 4; i++)
+    {
+        printf("\n");
+        for (int j = 0; j < 4; j++)
+        {
+            printf("%x, ", aes128_cbc_cipherText[(i * 4u) + j]);
+        }
+    }
+    printf("\n");
+}
+
+void transform_plainText()
+{
+    uint8_t temp;
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = i; j < 4; j++)
+        {
+            temp = aes128_cbc_plainText[(i * 4u) + j];
+            aes128_cbc_plainText[(i * 4u) + j] = aes128_cbc_plainText[(j * 4u) + i];
+            aes128_cbc_plainText[(j * 4u) + i] = temp;
+        }
+    }
+}
+
 int main()
 {
     puts(plainText);
+    memset ((void *)cipherText, 0x00, sizeof(cipherText));
 
     int byte = 0;
     do
@@ -63,12 +105,20 @@ int main()
     /* Generate the keys through key schedule */
     aes128_key_schedule (aes128_cbc_cipherKey);
 
-    /* Add the IV to the plain text */
-
     for (int i = 0; i < num_blocks; i++)
     {
         /* Copy the plain text for encryption */
         memcpy ((void *) aes128_cbc_plainText, (void *) &plainText[16 * i], sizeof(aes128_cbc_plainText));
+
+        for (int i = 0; i < 16u; i++)
+        {
+            printf("%x, ", aes128_cbc_plainText[i]);
+        }
+        printf("\n");
+
+        print_plainText();
+        transform_plainText();
+        print_plainText();
 
         if (i == 0)
         {
@@ -87,9 +137,13 @@ int main()
             }
         }
 
+        print_plainText();
+
         /* Encrypt the data */
         aes128_encrypt (aes128_cbc_plainText, aes128_cbc_cipherText);
 
+        print_cipherText();
+    
         memcpy ((void *) &cipherText[16 * i], (void *) aes128_cbc_cipherText, sizeof(aes128_cbc_cipherText));
     }
 
@@ -100,8 +154,20 @@ int main()
         /* Copy over the cipher text */
         memcpy ((void *) aes128_cbc_cipherText, (void *) &cipherText[16 * i], sizeof(aes128_cbc_cipherText));
 
+        for (int i = 0; i < 16u; i++)
+        {
+            printf("%x, ", aes128_cbc_cipherText[i]);
+        }
+        printf("\n");
+
         /* Decrypt the data */
         aes128_decrypt (aes128_cbc_cipherText, aes128_cbc_plainText);
+
+        for (int i = 0; i < 16u; i++)
+        {
+            printf("%x, ", aes128_cbc_plainText[i]);
+        }
+        printf("\n");
 
         if (i == 0)
         {
@@ -113,14 +179,29 @@ int main()
         }
         else
         {
+            /* Copy over the cipher text */
+            memcpy ((void *) aes128_cbc_cipherText, (void *) &cipherText[16 * (i - 1u)], sizeof(aes128_cbc_cipherText));
+
             for (int j = 0; j < 16u; j++)
             {
-                /* Copy over the cipher text */
-                memcpy ((void *) aes128_cbc_cipherText, (void *) &cipherText[16 * (i - 1u)], sizeof(aes128_cbc_cipherText));
                 /* Add the cipher text for previously obtained block */
                 aes128_cbc_plainText[j] ^= aes128_cbc_cipherText[j];
             }
         }
+
+        for (int i = 0; i < 16u; i++)
+        {
+            printf("%x, ", aes128_cbc_plainText[i]);
+        }
+        printf("\n");
+
+        transform_plainText();
+
+        for (int i = 0; i < 16u; i++)
+        {
+            printf("%x, ", aes128_cbc_plainText[i]);
+        }
+        printf("\n");
 
         memcpy ((void *) &plainText[16 * i], (void *) aes128_cbc_plainText, sizeof(aes128_cbc_plainText));
     }
