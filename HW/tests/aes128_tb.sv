@@ -37,7 +37,7 @@ reg reset_key_i, load_data_i, enc_or_dec_i;
 reg [127:0] plain_text, plain_text_i, cipher_text_i, cipher_text_o;
 reg [127:0] cipher_key, cipher_key_i;
 
-wire [127:0] cipher_text, round_o, round_key_i;
+wire [127:0] cipher_text;
 wire cipher_ready, key_ready;
 
 /* Initial values for reset key, plain text, cipher key */
