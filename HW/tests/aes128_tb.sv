@@ -68,7 +68,7 @@ initial plain_text_i = cipher_key;
 aes128 
     encrypt (.clk_i(clk), .reset_key_i(reset_key_i), .load_data_i(load_data_i),.plain_text_i(plain_text_i), 
             .cipher_key_i(cipher_key_i), .enc_or_dec_i(enc_or_dec_i), .cipher_text_o(cipher_text), .cipher_ready_o(cipher_ready),
-            .key_ready_o(key_ready), .round_o(round_o), .round_key_i(round_key_i));
+            .key_ready_o(key_ready));
 integer i;
 
 initial

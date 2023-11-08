@@ -1,3 +1,4 @@
+/* RCon LUT */
 module rcon (in, out);
     input [7:0] in;
     output reg [7:0] out;

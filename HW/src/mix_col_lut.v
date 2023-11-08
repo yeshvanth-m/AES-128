@@ -1,3 +1,4 @@
+/* Multiply by 2 LUT */
 module mul_by_2 (in, out);
     input [7:0] in;
     output reg [7:0] out;
@@ -263,6 +264,7 @@ module mul_by_2 (in, out);
     endcase
 endmodule
 
+/* Multiply by 3 LUT */
 module mul_by_3 (in, out);
     input [7:0] in;
     output reg [7:0] out;
@@ -524,6 +526,6 @@ module mul_by_3 (in, out);
         8'hfc: out = 8'h1f;
         8'hfd: out = 8'h1c;
         8'hfe: out = 8'h19;
-        8'hff: out = 8'h1;
+        8'hff: out = 8'h1a;
     endcase
 endmodule

@@ -1,3 +1,4 @@
+/* Module to substitute word */
 module sub_word (enc_or_dec_i, word_i, word_o);
 
 input enc_or_dec_i;
@@ -8,12 +9,14 @@ wire [31:0] sbox_o, inv_sbox_o;
 
 assign word_o = (enc_or_dec_i == 1'h1) ? sbox_o : inv_sbox_o;
 
+/* Instantiate S-Box modules to substitute bytes */
 S_Box
 	sbox_e1 (word_i[31:24], sbox_o[31:24]),
 	sbox_e2 (word_i[23:16], sbox_o[23:16]),
 	sbox_e3 (word_i[15:8],   sbox_o[15:8]),
 	sbox_e4 (word_i[7:0],     sbox_o[7:0]);
 	
+/* Instantiate inverse S-Box modules to substitute bytes */
 inv_S_Box
 	inv_sbox_e1 (word_i[31:24], inv_sbox_o[31:24]),
 	inv_sbox_e2 (word_i[23:16], inv_sbox_o[23:16]),
@@ -22,7 +25,7 @@ inv_S_Box
 
 endmodule
 
-/* S box */
+/* S box LUT */
 module S_Box (in, out);
     input [7:0] in;
     output reg [7:0] out;
@@ -288,7 +291,7 @@ module S_Box (in, out);
     endcase
 endmodule
 
-/* S box * x */
+/* Inverse S box */
 module inv_S_Box (in, out);
     input [7:0] in;
     output reg [7:0] out;

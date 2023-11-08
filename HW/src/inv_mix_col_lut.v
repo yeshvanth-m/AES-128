@@ -1,3 +1,4 @@
+/* Multiply by 9 LUT */
 module mul_by_9 (in, out);
     input [7:0] in;
     output reg [7:0] out;
@@ -263,6 +264,7 @@ module mul_by_9 (in, out);
     endcase
 endmodule
 
+/* Multiply by B LUT */
 module mul_by_b (in, out);
     input [7:0] in;
     output reg [7:0] out;
@@ -528,6 +530,7 @@ module mul_by_b (in, out);
     endcase
 endmodule
 
+/* Multiply by D LUT */
 module mul_by_d (in, out);
     input [7:0] in;
     output reg [7:0] out;
@@ -793,6 +796,7 @@ module mul_by_d (in, out);
     endcase
 endmodule
 
+/* Multiply by E LUT */
 module mul_by_e (in, out);
     input [7:0] in;
     output reg [7:0] out;
