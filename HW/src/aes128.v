@@ -17,10 +17,12 @@ reg [7:0] key_round_num, state_round_num;
 /* Wire to decide if the round needs mix column operation */
 wire mix_col_i;
 
-/* Initial value of key round number, state round number and key ready */
+/* Initial value of key and cipher ready, key and state round numbers, cipher text */
+initial cipher_ready_o = 1'h0;
+initial key_ready_o = 1'h0;
 initial key_round_num = 8'h0;
 initial state_round_num = 8'h0;
-initial key_ready_o = 1'h0;
+initial cipher_text_o = 128'h0;
 
 /* Decide whether mix column stage is required for that particular round based on encryption or decryption process */
 assign mix_col_i = (enc_or_dec_i) ? ((state_round_num == 8'hB) ? 1'h0 : 1'h1) : ((state_round_num == 8'hFF) ? 1'h0 : 1'h1);

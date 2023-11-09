@@ -86,6 +86,21 @@ void transform_plainText()
     }
 }
 
+void transform_cipherText()
+{
+    uint8_t temp;
+
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = i; j < 4; j++)
+        {
+            temp = aes128_cbc_cipherText[(i * 4u) + j];
+            aes128_cbc_cipherText[(i * 4u) + j] = aes128_cbc_cipherText[(j * 4u) + i];
+            aes128_cbc_cipherText[(j * 4u) + i] = temp;
+        }
+    }
+}
+
 int main()
 {
     puts(plainText);
@@ -116,9 +131,7 @@ int main()
         }
         printf("\n");
 
-        print_plainText();
         transform_plainText();
-        print_plainText();
 
         if (i == 0)
         {
@@ -142,6 +155,8 @@ int main()
         /* Encrypt the data */
         aes128_encrypt (aes128_cbc_plainText, aes128_cbc_cipherText);
 
+        transform_cipherText();
+
         print_cipherText();
     
         memcpy ((void *) &cipherText[16 * i], (void *) aes128_cbc_cipherText, sizeof(aes128_cbc_cipherText));
@@ -153,6 +168,8 @@ int main()
     {
         /* Copy over the cipher text */
         memcpy ((void *) aes128_cbc_cipherText, (void *) &cipherText[16 * i], sizeof(aes128_cbc_cipherText));
+
+        transform_cipherText();
 
         for (int i = 0; i < 16u; i++)
         {
