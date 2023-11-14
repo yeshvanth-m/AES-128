@@ -103,6 +103,7 @@ void transform_cipherText()
 
 int main()
 {
+    printf("\nPlain Text: ");
     puts(plainText);
     memset ((void *)cipherText, 0x00, sizeof(cipherText));
 
@@ -115,7 +116,7 @@ int main()
     num_blocks = (byte / 16u) + ((byte % 16u) > 0u);
     num_padding = byte % 16u;
 
-    printf("Size: %d\n", num_blocks);
+    printf("\nNumber of Blocks: %d\n", num_blocks);
 
     /* Generate the keys through key schedule */
     aes128_key_schedule (aes128_cbc_cipherKey);
@@ -124,12 +125,6 @@ int main()
     {
         /* Copy the plain text for encryption */
         memcpy ((void *) aes128_cbc_plainText, (void *) &plainText[16 * i], sizeof(aes128_cbc_plainText));
-
-        for (int i = 0; i < 16u; i++)
-        {
-            printf("%x, ", aes128_cbc_plainText[i]);
-        }
-        printf("\n");
 
         transform_plainText();
 
@@ -150,18 +145,15 @@ int main()
             }
         }
 
-        print_plainText();
-
         /* Encrypt the data */
         aes128_encrypt (aes128_cbc_plainText, aes128_cbc_cipherText);
 
         transform_cipherText();
 
-        print_cipherText();
-    
         memcpy ((void *) &cipherText[16 * i], (void *) aes128_cbc_cipherText, sizeof(aes128_cbc_cipherText));
     }
 
+    printf("\nCipher Text: ");
     puts(cipherText);
 
     for (int i = 0; i < num_blocks; i++)
@@ -171,20 +163,8 @@ int main()
 
         transform_cipherText();
 
-        for (int i = 0; i < 16u; i++)
-        {
-            printf("%x, ", aes128_cbc_cipherText[i]);
-        }
-        printf("\n");
-
         /* Decrypt the data */
         aes128_decrypt (aes128_cbc_cipherText, aes128_cbc_plainText);
-
-        for (int i = 0; i < 16u; i++)
-        {
-            printf("%x, ", aes128_cbc_plainText[i]);
-        }
-        printf("\n");
 
         if (i == 0)
         {
@@ -206,22 +186,11 @@ int main()
             }
         }
 
-        for (int i = 0; i < 16u; i++)
-        {
-            printf("%x, ", aes128_cbc_plainText[i]);
-        }
-        printf("\n");
-
         transform_plainText();
-
-        for (int i = 0; i < 16u; i++)
-        {
-            printf("%x, ", aes128_cbc_plainText[i]);
-        }
-        printf("\n");
 
         memcpy ((void *) &plainText[16 * i], (void *) aes128_cbc_plainText, sizeof(aes128_cbc_plainText));
     }
 
+    printf("\nDecrypted Plain Text: ");
     puts(plainText);
 }
