@@ -20,7 +20,7 @@ This design is made keeping in mind the FPGA implementation and use of AXI GPIO 
 
 Link: https://www.xilinx.com/products/intellectual-property/1-1cqcpdv.html#productspecs
 
-### Implementation on the ZU1CG FPGA can be found here: https://github.com/yeshvanth-m/ZUBoard-1CG_RT
+Implementation on the ZU1CG FPGA can be found here: https://github.com/yeshvanth-m/ZUBoard-1CG_RT
 
 ## Design
 
